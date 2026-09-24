@@ -1,0 +1,184 @@
+// A single hand-authored CaseWorld, used to build and test the entire
+// deterministic game loop before any LLM is involved (Phase 2 of the build).
+// Shape matches the canonical schema in ARCHITECTURE.md exactly, so swapping
+// this for an LLM-generated case later (Phase 5) requires no changes to any
+// route or lib file — only caseGenerator.js changes.
+
+export function makeHardcodedCase() {
+  return {
+    victim: "Eleanor Voss",
+    setting: "Blackwood Manor, during a storm-bound dinner party",
+
+    locations: [
+      { id: "loc_study", name: "The Study", description: "Where Eleanor was found. Heavy oak door, one window latched from inside." },
+      { id: "loc_dining", name: "The Dining Room", description: "Where the party gathered for dinner and after-dinner drinks." },
+      { id: "loc_garden", name: "The Garden Path", description: "A gravel path along the east wing, exposed to the storm." },
+    ],
+
+    events: [
+      { id: "ev_dinner", time: "8:00 PM", description: "Dinner is served to the full party.", location_id: "loc_dining" },
+      { id: "ev_argument", time: "8:45 PM", description: "Raised voices are heard coming from the study.", location_id: "loc_study" },
+      { id: "ev_death", time: "9:15 PM", description: "Eleanor's body is discovered in the study.", location_id: "loc_study" },
+    ],
+
+    suspects: [
+      {
+        id: "sus_partner",
+        name: "James Calloway",
+        relationship_to_victim: "Business partner",
+        alibi_claim: "I was in the dining room with everyone the entire evening after dinner.",
+        is_culprit: true, // PRIVATE — never sent to the client pre-verdict
+        secret: "He had been quietly embezzling from the partnership for over a year.", // PRIVATE
+        knowledge: [
+          {
+            fact_id: "fact_partner_air",
+            fact: "I did step outside briefly around nine, just to get some air.",
+            trigger_keywords: ["nine", "9", "step out", "air", "outside", "leave", "garden"],
+          },
+          {
+            fact_id: "fact_partner_finance",
+            fact: "Eleanor and I had some disagreements about the business finances, but nothing serious.",
+            trigger_keywords: ["finance", "money", "business", "ledger", "argument", "dispute", "partnership"],
+          },
+        ],
+      },
+      {
+        id: "sus_niece",
+        name: "Priya Voss",
+        relationship_to_victim: "Niece",
+        alibi_claim: "I was walking alone on the garden path, reading a letter I'd received.",
+        is_culprit: false,
+        secret: "The letter was from an ex-fiancé; she was embarrassed, not involved in the death.",
+        knowledge: [
+          {
+            fact_id: "fact_niece_letter",
+            fact: "I was upset about a personal letter, that's why I went out to the garden alone.",
+            trigger_keywords: ["letter", "garden", "upset", "why", "outside", "alone"],
+          },
+          {
+            fact_id: "fact_niece_voices",
+            fact: "I heard raised voices coming from the study, around a quarter to nine.",
+            trigger_keywords: ["voices", "argument", "study", "hear", "quarter", "8:45", "845"],
+          },
+        ],
+      },
+      {
+        id: "sus_butler",
+        name: "Mr. Hendricks",
+        relationship_to_victim: "Household butler",
+        alibi_claim: "I was outside at the woodshed, collecting firewood for the evening.",
+        is_culprit: false,
+        secret: null,
+        knowledge: [
+          {
+            fact_id: "fact_butler_firewood",
+            fact: "I went out to the shed for firewood around half past eight.",
+            trigger_keywords: ["firewood", "shed", "outside", "half past eight", "830", "wood"],
+          },
+          {
+            fact_id: "fact_butler_disturb",
+            fact: "Mr. Calloway asked me not to disturb him and Mrs. Voss while they spoke privately in the study.",
+            trigger_keywords: ["calloway", "disturb", "study", "spoke", "privately", "partner", "james"],
+          },
+        ],
+      },
+    ],
+
+    evidence: [
+      {
+        id: "evd_ledger",
+        description: "A financial ledger showing a discrepancy of several thousand pounds, unexplained.",
+        location_id: "loc_study",
+        discoverable_at: "investigation",
+        is_red_herring: false,
+      },
+      {
+        id: "evd_glass",
+        description: "A brandy glass with two distinct sets of fingerprints, found near the desk.",
+        location_id: "loc_study",
+        discoverable_at: "investigation",
+        is_red_herring: false,
+      },
+      {
+        id: "evd_timepiece",
+        description: "Eleanor's pocket watch, stopped at 9:12 PM.",
+        location_id: "loc_study",
+        discoverable_at: "investigation",
+        is_red_herring: false,
+      },
+      {
+        id: "evd_testimony_note",
+        description: "A short note in the butler's hand, recording that he was asked to keep everyone away from the study after 8:45.",
+        location_id: "loc_dining",
+        discoverable_at: "investigation",
+        is_red_herring: false,
+      },
+      {
+        id: "evd_letter",
+        description: "A torn, tear-stained letter addressed to Priya, signed by someone other than the victim.",
+        location_id: "loc_garden",
+        discoverable_at: "investigation",
+        is_red_herring: true,
+      },
+      {
+        id: "evd_muddy_shoes",
+        description: "A pair of muddy shoes left by the garden door, matching the storm-soaked path outside.",
+        location_id: "loc_garden",
+        discoverable_at: "investigation",
+        is_red_herring: true,
+      },
+    ],
+
+    solution: {
+      culprit_id: "sus_partner",
+      motive_text: "Concealing embezzlement from the business partnership.",
+      method_text: "Confronted Eleanor over the ledger and struck her during their argument in the study.",
+    },
+
+    // PRIVATE — the full ground-truth edge set. Never sent to the client until verdict.
+    edges: [
+      {
+        evidence_id: "evd_ledger",
+        suspect_id: "sus_partner",
+        claim_type: "ESTABLISHES_MOTIVE",
+        metadata: { location_id: null, event_id: null, note: "The embezzlement Eleanor had discovered." },
+        is_required: true,
+      },
+      {
+        evidence_id: "evd_glass",
+        suspect_id: "sus_partner",
+        claim_type: "PLACES_AT",
+        metadata: { location_id: "loc_study", event_id: "ev_death", note: "Places him at the scene near the time of death." },
+        is_required: true,
+      },
+      {
+        evidence_id: "evd_testimony_note",
+        suspect_id: "sus_partner",
+        claim_type: "CONTRADICTS",
+        metadata: { location_id: null, event_id: "ev_argument", note: "Contradicts his claim of never leaving the dining room." },
+        is_required: true,
+      },
+      {
+        evidence_id: "evd_timepiece",
+        suspect_id: "sus_partner",
+        claim_type: "ESTABLISHES_METHOD",
+        metadata: { location_id: "loc_study", event_id: "ev_death", note: "Time of death aligns with his unaccounted-for window." },
+        is_required: true,
+      },
+      {
+        evidence_id: "evd_letter",
+        suspect_id: "sus_niece",
+        claim_type: "SUPPORTS_ALIBI",
+        metadata: { location_id: "loc_garden", event_id: null, note: "Explains why she was genuinely in the garden — unrelated to the case." },
+        is_required: false,
+      },
+      {
+        evidence_id: "evd_muddy_shoes",
+        suspect_id: "sus_butler",
+        claim_type: "SUPPORTS_ALIBI",
+        metadata: { location_id: "loc_garden", event_id: null, note: "Consistent with his firewood errand — unrelated to the case." },
+        is_required: false,
+      },
+    ],
+  };
+}
