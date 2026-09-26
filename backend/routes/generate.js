@@ -1,18 +1,31 @@
 import { Router } from "express";
-import { makeHardcodedCase } from "../data/hardcodedCase.js";
+import { generateCase } from "../lib/caseGenerator.js";
 import { createSession, getSession } from "../lib/caseStore.js";
 import { buildPlayerView } from "../lib/gameView.js";
 
 const router = Router();
 
-// Phase 2: always serves the hardcoded case. Phase 5 will replace the
-// makeHardcodedCase() call with the LLM generation + validation pipeline,
-// without changing anything else in this file.
-router.post("/generate", (req, res) => {
-  const caseWorld = makeHardcodedCase();
-  const caseId = createSession(caseWorld);
-  const session = getSession(caseId);
-  res.json({ caseId, playerView: buildPlayerView(session) });
+// Full AI generation pipeline: LLM call → validate → retry → fallback.
+// Replaces the Phase 2 hardcoded case with the real generation pipeline.
+router.post("/generate", async (req, res) => {
+  try {
+    const { caseWorld, fallbackServed, attempts } = await generateCase();
+
+    if (fallbackServed) {
+      console.warn("[generate] Serving fallback case after failed generation.");
+    } else {
+      console.log(
+        `[generate] AI case generated successfully (attempt ${attempts.length}).`
+      );
+    }
+
+    const caseId = createSession(caseWorld);
+    const session = getSession(caseId);
+    res.json({ caseId, playerView: buildPlayerView(session) });
+  } catch (err) {
+    console.error("[generate] Unexpected error:", err);
+    res.status(500).json({ error: "Failed to generate case. Please retry." });
+  }
 });
 
 export default router;
