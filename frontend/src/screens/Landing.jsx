@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGameDispatch } from "../state/gameStateStore.js";
+import { useGameDispatch } from "../state/gameStateStore.jsx";
 import { generateCase } from "../lib/apiClient.js";
 
 export default function Landing() {

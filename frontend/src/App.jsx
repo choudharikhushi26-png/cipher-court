@@ -1,5 +1,5 @@
 import "./index.css";
-import { GameStateProvider, useGameState, useGameDispatch } from "./state/gameStateStore.js";
+import { GameStateProvider, useGameState, useGameDispatch } from "./state/gameStateStore.jsx";
 
 import Landing from "./screens/Landing.jsx";
 import Briefing from "./screens/Briefing.jsx";

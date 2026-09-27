@@ -1,4 +1,4 @@
-import { useGameState, useGameDispatch } from "../state/gameStateStore.js";
+import { useGameState, useGameDispatch } from "../state/gameStateStore.jsx";
 import ScoreBreakdown from "../components/ScoreBreakdown.jsx";
 
 export default function Verdict() {

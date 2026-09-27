@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGameState, useGameDispatch } from "../state/gameStateStore.js";
+import { useGameState, useGameDispatch } from "../state/gameStateStore.jsx";
 import SuspectCard from "../components/SuspectCard.jsx";
 
 export default function ReasoningBuilder() {

@@ -8,10 +8,6 @@ export default defineConfig({
       loader: { ".js": "jsx" },
     },
   },
-  esbuild: {
-    loader: "jsx",
-    include: /src\/.*\.js$/,
-  },
   server: {
     port: 5173,
     proxy: {

@@ -1,4 +1,4 @@
-import { useGameState, useGameDispatch } from "../state/gameStateStore.js";
+import { useGameState, useGameDispatch } from "../state/gameStateStore.jsx";
 
 export default function Reveal() {
   const state = useGameState();

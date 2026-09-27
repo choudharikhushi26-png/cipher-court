@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGameState, useGameDispatch } from "../state/gameStateStore.js";
+import { useGameState, useGameDispatch } from "../state/gameStateStore.jsx";
 import EvidenceCard from "../components/EvidenceCard.jsx";
 import SuspectCard from "../components/SuspectCard.jsx";
 import ClaimPicker from "../components/ClaimPicker.jsx";
