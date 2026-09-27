@@ -10,7 +10,7 @@ export default defineConfig({
   },
   esbuild: {
     loader: "jsx",
-    include: /src\/.*\.js$/,
+    include: /src\/.*\.jsx?$/,
   },
   server: {
     port: 5173,

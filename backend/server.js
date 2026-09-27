@@ -8,7 +8,20 @@ import askSuspectRoute from "./routes/askSuspect.js";
 import submitReasoningRoute from "./routes/submitReasoning.js";
 
 const app = express();
-app.use(cors());
+
+// Enable CORS for all origins (including Vercel deployments *.vercel.app and localhost)
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests from all origins (Vercel, localhost, curl, etc.)
+      callback(null, true);
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
+  })
+);
+app.options("*", cors());
 app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));

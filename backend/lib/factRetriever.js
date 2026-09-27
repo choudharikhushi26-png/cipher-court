@@ -7,7 +7,19 @@ function normalize(text) {
 }
 
 function tokenize(text) {
-  return new Set(normalize(text).split(/\s+/).filter(Boolean));
+  const norm = normalize(text);
+  const words = norm.split(/\s+/).filter(Boolean);
+  const set = new Set(words);
+  for (const w of words) {
+    if (w.includes(":")) {
+      const parts = w.split(":");
+      parts.forEach((p) => {
+        if (p) set.add(p);
+      });
+      set.add(w.replace(":", ""));
+    }
+  }
+  return set;
 }
 
 /**

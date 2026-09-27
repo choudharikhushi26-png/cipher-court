@@ -1,7 +1,8 @@
 // Thin fetch wrapper to backend endpoints.
 // Every API call goes through here so error-handling is consistent.
 
-const BASE = "/api";
+const rawBase = (import.meta.env.VITE_API_BASE_URL || "http://localhost:4000").replace(/\/$/, "");
+const BASE = rawBase.endsWith("/api") ? rawBase : `${rawBase}/api`;
 
 async function request(method, path, body) {
   const opts = {

@@ -76,6 +76,26 @@ function sleep(ms) {
  *   attempts: array of { attemptNumber, valid, errors, stages, durationMs }
  */
 export async function generateCase() {
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn(
+      `[caseGenerator] GEMINI_API_KEY not set. Serving fallback case immediately.`
+    );
+    const fallback = await loadFallback();
+    return {
+      caseWorld: fallback.caseWorld,
+      fallbackServed: true,
+      attempts: [
+        {
+          attemptNumber: 1,
+          valid: false,
+          errors: ["GEMINI_API_KEY not set in environment."],
+          stages: [],
+          durationMs: 0,
+        },
+      ],
+    };
+  }
+
   const attempts = [];
 
   for (let attempt = 1; attempt <= 2; attempt++) {

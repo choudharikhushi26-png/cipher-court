@@ -22,8 +22,9 @@ router.post("/:caseId/submit-reasoning", (req, res) => {
     revealedCase: session.caseWorld,
   });
 
-  // Session's job is done; free memory rather than wait for TTL sweep.
-  deleteSession(req.params.caseId);
+  // Session will be cleaned up by TTL sweep (2 hours) or server restart.
+  // Keeping it prevents 404 errors if player re-submits or connection retries.
+  // deleteSession(req.params.caseId);
 });
 
 export default router;
